@@ -1,0 +1,90 @@
+.auth {
+	display: flex;
+	flex-direction: column;
+}
+
+.form__container {
+    display: flex;
+    flex-direction: column;
+    margin: 40px;
+}
+
+.form {
+	display: flex;
+	flex-direction: column;
+	align-items: center;	
+}
+
+.auth_input {
+    width: 100% !important;
+    display: flex;
+    flex: 1;
+	
+}
+
+#auth_inputBox{
+    display: flex;
+    flex: 1;
+    width: 100% !important;
+    margin: 10px 0;
+}
+
+.showPassword {
+    position: absolute !important;
+    right: 30px;
+}
+
+.terms span {
+	color: #075ee0;
+}
+
+.divider {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.divider hr {
+	height: 1px;
+	background-color: rgb(201, 198, 198);
+	border: none;
+	width: 100%;
+}
+
+.divider p {
+	margin: 0 10px;
+	font-size: 17px;
+	color: rgb(131, 130, 130);
+}
+
+.signIn__button {
+	margin: 20px 0 !important;
+	background-color: #075ee0 !important;
+	color: white !important;
+	border-radius: 20px !important;
+}
+
+.signInWithGoogle__button {
+	background-color: white !important;
+	border: 1px solid rgba(0, 0, 0, 0.1) !important;
+	margin: 20px 0 !important;
+	border-radius: 40px !important;
+}
+
+.googleLogo {
+	height: 25px;
+	border-radius: 50%;
+	object-fit: cover;
+	margin-right: 10px;
+}
+
+.login__newUser {
+	font-size: 17px;
+}
+
+.login__newUser span {
+	font-weight: 500;
+	margin-left: 5px;
+	color: #075ee0;
+	cursor: pointer;
+}
