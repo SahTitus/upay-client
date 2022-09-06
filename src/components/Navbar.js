@@ -1,7 +1,8 @@
 import { Add, Menu } from "@mui/icons-material";
-import { Avatar, IconButton } from "@mui/material";
+import { Avatar, Button, IconButton } from "@mui/material";
 import React, { useState } from "react";
 import styles from "../styles/Navbar.module.css";
+import { logout } from "../redux/auth";
 
 import {
   Box,
@@ -13,13 +14,14 @@ import {
 
 import { Apps, Home,  People, Receipt, Paid, Logout} from "@mui/icons-material";
 import { Link } from "react-router-dom";
+import { useDispatch } from "react-redux";
 
 const listItems = [
   {
     listIcon: <Home />,
     listText: "Admin",
     add: false,
-    link: '/students',
+    link: '/',
   },
   {
     listIcon: <Apps />,
@@ -35,57 +37,97 @@ const listItems = [
   },
   {
     listIcon: <Receipt />,
-    listText: "Receipts",
+    listText: "Invoice",
     add: false,
-    link: '/students',
+    link: '/addstudent',
   },
   {
     listIcon: <Paid />,
     listText: "Make payment",
     add: false,
-    link: '/students',
+    link: '/pay',
   },
-  {
-    listIcon: <Logout />,
-    listText: "Log out",
-    add: false,
-    link: '/students',
-  },
-  {
-    listIcon: <Add />,
-    listText: "Add Student",
-    add: true,
-    link: '/students',
-  },
+
  
 ];
 
 const Navbar = () => {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
+  const user = JSON.parse(localStorage.getItem("profile"));
+  const dispatch = useDispatch();
 
   const toggleSlider = () => {
     setOpen(!open);
   };
 
+  const logOut = () => {
+    dispatch(logout());
+    window.location.reload(true);
+    // closeDrawer()
+  };
+
   const sideList = () => (
     <Box className={styles.sidebar} component="div" sx={{width: '250px', marginTop: '10px',}}>
-     <div className={styles.side__user}>
-     <Avatar className={styles.side__avatar} src="https://i.ibb.co/rx5DFbs/avatar.png" alt="Juaneme8"  />
-     <div className={styles.side__userInfo}>
-      <p>Sah Jay</p>
-      <span>sah@gmail.com</span>
-     </div>
-     </div>
+  <div className={styles.side__user}>
+        {user ? (
+          <>
+            <Avatar
+              className={styles.side__avatar}
+              src={user?.result?.photoURL}
+              alt="Juaneme8"
+            >
+              {user?.result?.displayName?.charAt(0) ||
+                user?.result?.name.charAt(0)}{" "}
+            </Avatar>
+            <div className={styles.side__userInfo}>
+              <p>{user?.result?.displayName || user?.result?.name}</p>
+              <span>{user?.result?.email}</span>
+            </div>
+          </>
+        ) : (
+          <Link className={styles.signIn__wrapper} to="/auth">
+            <Button className={styles.signIn}>Sign In</Button>
+          </Link>
+        )}
+      </div>
       <Divider />
       <List>
         {listItems.map((listItem, index) => (
           <Link className={styles.link} key={index} to={listItem?.link}>
-          <ListItem button key={index} className={`${styles.drawer__listItem} ${listItem.add && styles.add__button}`}>
-            <div className={styles.drawer__listIcon}>{listItem.listIcon}</div>
-            <div className={styles.drawer__listText} >{listItem.listText}</div>
-          </ListItem>
+            <ListItem
+              button
+              key={index}
+              className={`${styles.drawer__listItem} ${
+                listItem.add && styles.add__button
+              }`}
+            >
+              <div className={styles.drawer__listIcon}>{listItem.listIcon}</div>
+              <div className={styles.drawer__listText}>{listItem.listText}</div>
+            </ListItem>
           </Link>
         ))}
+
+        <ListItem
+          onClick={logOut}
+          button
+          className={`${styles.drawer__listItem} `}
+        >
+          <div className={styles.drawer__listIcon}>
+            <Logout />
+          </div>
+          <div className={styles.drawer__listText}>Log out</div>
+        </ListItem>
+        <Link to='/addstudent'>
+        <ListItem
+          button
+          className={`${styles.drawer__listItem} ${styles.add__button} `}
+        >
+          <div className={styles.drawer__listIcon}>
+            <Add />
+          </div>
+          <div className={styles.drawer__listText}>Add Student</div>
+        </ListItem>
+        </Link>
       </List>
     </Box>
   );
@@ -96,9 +138,11 @@ const Navbar = () => {
       <IconButton onClick={toggleSlider} className={styles.menu}>
         <Menu />
       </IconButton>
+      <Link to='/profile'>
       <IconButton className={styles.avatar_container}>
         <Avatar className={styles.avatar} />
       </IconButton>
+      </Link>
       <Drawer
       
         className={styles.drawer}

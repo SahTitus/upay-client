@@ -144,9 +144,13 @@
 .trans__headings {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    /* justify-content: space-between; */
     margin:  0 10px;
     
+}
+
+.trans__heading {
+  width: 25%;
 }
 
 

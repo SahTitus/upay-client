@@ -1,13 +1,15 @@
 import React from "react";
 import "./styles/App.css";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-// import Profile from "./pages/Profile";
+import Profile from "./pages/Profile";
 import Auth from "./components/Auth";
 import Dashboard from "./pages/Dashboard";
 import Navbar from "./components/Navbar";
 import Students from "./pages/Students";
+import AddStudent from "./pages/AddStudent";
 import Admin from "./pages/Admin";
 import Sidebar from "./components/Sidebar";
+import Pay from "./pages/Pay";
 
 // import { useTheme } from "./utils/useTheme";
 // import { ThemeProvider } from "styled-components";
@@ -36,11 +38,13 @@ function App() {
 
 
           <Routes >
-            {/* <Route path="/profile" element={<Profile />} /> */}
-            {/* <Route path="/auth" element={<Auth />} /> */}
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/pay" element={<Pay />} />
             <Route path="/" element={<Admin />} />
             {/* <Route path="/" element={<Dashboard />} /> */}
             <Route path="/students" element={<Students />} />
+            <Route path="/addstudent" element={<AddStudent />} />
           </Routes>
         </div>
         {/* <BottomNavigation />			 */}

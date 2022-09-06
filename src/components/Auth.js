@@ -1,27 +1,36 @@
 import {
   AlternateEmail,
+  Class,
   Lock,
   Person,
+  School,
   Visibility,
   VisibilityOff,
 } from "@mui/icons-material";
-import { Box, Button, IconButton, TextField } from "@mui/material";
+import {
+  Box,
+  Button,
+  FormControl,
+  IconButton,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+} from "@mui/material";
 import React, { useState } from "react";
 import styles from "../styles/Auth.module.css";
 import Go from "../images/Go.png";
 import { signInWithPopup, GoogleAuthProvider } from "@firebase/auth";
 import { auth } from "../firebase";
-import {
-	authData
-} from "../../redux/auth";
+import { authData } from "../redux/auth";
 import { useDispatch } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
-
-
+import { useNavigate } from "react-router-dom";
+import { signin, signup } from "../actions/auth";
 const initialState = {
-  firstName: "",
-  lastName: "",
+  name: "",
   email: "",
+  program: "",
+  level: "",
   password: "",
   confirmPassword: "",
 };
@@ -36,6 +45,16 @@ const Auth = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  const [open, setOpen] = React.useState(false);
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const handleOpen = () => {
+    setOpen(true);
+  };
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -46,17 +65,31 @@ const Auth = () => {
 
   const signInWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
-    const user = await signInWithPopup(auth, provider)
-    const token = user._tokenResponse.idToken
-    const result = user.user
+    const user = await signInWithPopup(auth, provider);
+    const token = user._tokenResponse.idToken;
+    const result = user.user;
     try {
-    dispatch(authData({ result, token}))
-      console.log(user)
+      dispatch(authData({ result, token }));
+      console.log(user);
       navigate(-1);
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-    
+  };
+
+  const isSignup = false;
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (!isSignup) {
+      dispatch(signup(formData, navigate));
+    } else {
+      dispatch(signin(formData, navigate));
+    }
+
+    setFormData({ ...formData, initialState: "" });
+    console.log(formData);
   };
 
   return (
@@ -70,39 +103,84 @@ const Auth = () => {
           >
             <AlternateEmail sx={{ color: "action.active", mr: 1, my: 0.5 }} />
             <TextField
-            onChange={handleChange}
+              onChange={handleChange}
               id={styles.auth_input}
               required
               label="Email"
               name="email"
               variant="standard"
-               className={styles.auth_input}
+              className={styles.auth_input}
             />
           </Box>
-         {!user && (
-           <Box
-           id={styles.auth_inputBox}
-           sx={{ display: "flex", alignItems: "flex-end" }}
-         >
-           <Person sx={{ color: "action.active", mr: 1, my: 0.5 }} />
-           <TextField
-           onChange={handleChange}
-             id={styles.auth_input}
-             required
-             label="Full name"
-             variant="standard"
-             className={styles.auth_input}
-             name="name"
-           />
-         </Box>
-         )}
+          {!user && (
+            <>
+              <Box
+                id={styles.auth_inputBox}
+                sx={{ display: "flex", alignItems: "flex-end" }}
+              >
+                <Person sx={{ color: "action.active", mr: 1, my: 0.5 }} />
+                <TextField
+                  onChange={handleChange}
+                  id={styles.auth_input}
+                  required
+                  label="Full name"
+                  variant="standard"
+                  className={styles.auth_input}
+                  name="name"
+                />
+              </Box>
+              <Box
+                id={styles.auth_inputBox}
+                sx={{ display: "flex", alignItems: "flex-end" }}
+              >
+                <School sx={{ color: "action.active", mr: 1, my: 0.5 }} />
+                <TextField
+                  onChange={handleChange}
+                  id={styles.auth_input}
+                  required
+                  label="Program"
+                  variant="standard"
+                  className={styles.auth_input}
+                  name="program"
+                />
+              </Box>
+              <Box
+                id={styles.auth_inputBox}
+                sx={{ display: "flex", alignItems: "center" }}
+              >
+                <Class sx={{ color: "action.active", mr: 1, my: 0.5 }} />
+                <div>
+                  <FormControl sx={{ m: 1, minWidth: 200 }}>
+                    <InputLabel id="demo-controlled-open-select-label">
+                      Level
+                    </InputLabel>
+                    <Select
+                      labelId="demo-controlled-open-select-label"
+                      id="demo-controlled-open-select"
+                      open={open}
+                      onClose={handleClose}
+                      onOpen={handleOpen}
+                      name="level"
+                      label="Level"
+                      onChange={handleChange}
+                    >
+                      <MenuItem value={100}>100</MenuItem>
+                      <MenuItem value={200}>200</MenuItem>
+                      <MenuItem value={300}>300</MenuItem>
+                      <MenuItem value={400}>400</MenuItem>
+                    </Select>
+                  </FormControl>
+                </div>
+              </Box>
+            </>
+          )}
           <Box
             id={styles.auth_inputBox}
             sx={{ display: "flex", alignItems: "flex-end" }}
           >
             <Lock sx={{ color: "action.active", mr: 1, my: 0.5 }} />
             <TextField
-            onChange={handleChange}
+              onChange={handleChange}
               id={styles.auth_input}
               className={styles.auth_input}
               required
@@ -111,7 +189,10 @@ const Auth = () => {
               variant="standard"
               name="password"
             />
-            <IconButton className={styles.showPassword}  onClick={toggleShowPassword}>
+            <IconButton
+              className={styles.showPassword}
+              onClick={toggleShowPassword}
+            >
               {!showPassword ? (
                 <VisibilityOff className="showPassword" />
               ) : (
@@ -119,34 +200,34 @@ const Auth = () => {
               )}
             </IconButton>
           </Box>
-        {!user && (
+          {!user && (
             <Box
-            id={styles.auth_inputBox}
-            sx={{ display: "flex", alignItems: "flex-end" }}
-          >
-            <Lock sx={{ color: "action.active", mr: 1, my: 0.5 }} />
-            <TextField
-            onChange={handleChange}
-             className={styles.auth_input}
-              id={styles.auth_input}
-              required
-              type={showPassword ? "text" : "password"}
-              label="Confirm password"
-              name="confirmPassword"
-              variant="standard"
-            />
-          </Box>
-        )}
+              id={styles.auth_inputBox}
+              sx={{ display: "flex", alignItems: "flex-end" }}
+            >
+              <Lock sx={{ color: "action.active", mr: 1, my: 0.5 }} />
+              <TextField
+                onChange={handleChange}
+                className={styles.auth_input}
+                id={styles.auth_input}
+                required
+                type={showPassword ? "text" : "password"}
+                label="Confirm password"
+                name="confirmPassword"
+                variant="standard"
+              />
+            </Box>
+          )}
         </form>
-      {!user && (
+        {!user && (
           <p className={styles.terms}>
-          By signing up your`re agree to our <span>Terms & Conditions</span> and{" "}
-          <span>Privacy Policy</span>
-        </p>
-      )}
+            By signing up your`re agree to our <span>Terms & Conditions</span>{" "}
+            and <span>Privacy Policy</span>
+          </p>
+        )}
         <Button
           className={styles.signIn__button}
-          //   onClick={handleSubmit}
+          onClick={handleSubmit}
           // onClick={signInWithEmailAndPassword}
         >
           {user ? "Sign In" : "Sign Up"}
@@ -158,7 +239,7 @@ const Auth = () => {
         </div>
         <Button
           className={styles.signInWithGoogle__button}
-          // onClick={signInWithGoogle}
+          onClick={signInWithGoogle}
         >
           <img className={styles.googleLogo} src={Go} alt="" />
           Continue with Google

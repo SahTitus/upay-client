@@ -11,6 +11,24 @@
     padding: 5px 3px;
 }
 
+.signIn__wrapper {
+    align-items: center !important;
+    display: flex !important;
+    background-color: #2175a5 !important;   
+    width: 100% !important;
+    height: 100% !important;
+    margin: -10px;
+    padding: 10px;
+    text-decoration: none;
+}
+
+.signIn {
+    background-color: #ffffff !important;
+    color: rgb(156, 27, 27) !important;
+    width: 95% !important;
+    border-radius: 5px !important;
+}
+
 .menu {
     margin-left: 10px;
     cursor: pointer;

@@ -3,9 +3,11 @@ import { Avatar, IconButton } from "@mui/material";
 import styles from "../styles/Admin.module.css";
 import { Check, Clear } from '@mui/icons-material';
 import av from "../images/av.svg";
+import moment from "moment";
 
+const AdmTranslist = ({name, amount, status, id, dep, timestamp}) => {
+  const date = moment(timestamp).format(" MMMM Do YYYY, h:mm")
 
-const AdmTranslist = ({name, status, id, dep}) => {
   return (
     // <div className={styles.listItem}>
     //     <div className={styles.listItem}>
@@ -25,13 +27,13 @@ const AdmTranslist = ({name, status, id, dep}) => {
       </div>
       <div className={styles.info}>
         <p className={styles.title}>
-          Sah Titus <span> {122445800}</span>
+          Sah Titus <span> {id}</span>
         </p>
        
-        <span className={styles.timestamp}>16 Oct 2022, 10:20AM</span>
+        <span className={styles.timestamp}>{date}</span>
       </div>
       <div className={styles.status}>
-        <strong>GHS {450}</strong>
+        <strong>GHS {amount}</strong>
         {status ? (
           <span className={styles.success}><Check /> </span>
         ) : (
