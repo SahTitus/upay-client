@@ -17,15 +17,16 @@ import {
   Select,
   TextField,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styles from "../styles/Auth.module.css";
-import Go from "../images/Go.png";
-import { signInWithPopup, GoogleAuthProvider } from "@firebase/auth";
-import { auth } from "../firebase";
-import { authData } from "../redux/auth";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { signin, signup } from "../actions/auth";
+import { signin, signup, updateUser } from "../actions/auth";
+import { ImageFill } from "react-bootstrap-icons";
+import Resizer from "react-image-file-resizer";
+import { useStateContex } from "../store/StateProvider";
+import { isError } from "../redux/auth";
+
 const initialState = {
   name: "",
   email: "",
@@ -37,11 +38,13 @@ const initialState = {
 
 const Auth = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [user, setUser] = useState(false);
+  const [user, setUser] = useState(true);
+  const [image, setImage] = useState(null);
   const [formData, setFormData] = useState(initialState);
-  console.log(formData);
+  const userMe = JSON.parse(localStorage.getItem("profile"));
+  console.log(userMe);
 
-  // const { darkMode } = useStateContex();
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -55,6 +58,15 @@ const Auth = () => {
     setOpen(true);
   };
 
+  useEffect(() => {
+    if (userMe) setFormData({ ...userMe?.result, confirmPassword: userMe?.result?.password });
+ setImage(userMe?.result?.image);
+ if (userMe?.result?._id) setUser(false);
+  }, []);
+
+  console.log(userMe);
+
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -63,27 +75,41 @@ const Auth = () => {
     setShowPassword((prevShowPassword) => !prevShowPassword);
   };
 
-  const signInWithGoogle = async () => {
-    const provider = new GoogleAuthProvider();
-    const user = await signInWithPopup(auth, provider);
-    const token = user._tokenResponse.idToken;
-    const result = user.user;
-    try {
-      dispatch(authData({ result, token }));
-      console.log(user);
-      navigate(-1);
-    } catch (error) {
-      console.log(error);
-    }
+  let inputFileRef = useRef(null);
+  const selectImg = (e) => {
+    e.preventDefault();
+    inputFileRef.click();
   };
 
-  const isSignup = false;
+  const handleImage = (e) => {
+    const file = e.target.files[0];
+    console.log("ss");
+    Resizer.imageFileResizer(
+      file,
+      700,
+      770,
+      "JPEG",
+      92,
+      0,
+      (uri) => {
+        setImage(uri);
+      },
+      "base64"
+    );
+
+    if (file["type"].split("/")[0] !== "image") {
+      alert("Hehehe 😆 file is not an image");
+    }
+    // setFileToBase(file);
+  };
+
+  console.log(image)
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (!isSignup) {
-      dispatch(signup(formData, navigate));
+    if (!user) {
+      dispatch(signup({...formData, image}, navigate));
     } else {
       dispatch(signin(formData, navigate));
     }
@@ -92,11 +118,48 @@ const Auth = () => {
     console.log(formData);
   };
 
+  
+  const handleUpdate = (e) => {
+    e.preventDefault();
+
+      dispatch(updateUser(userMe?.result?._id,{...formData, image: image}, navigate, 'goToDashboard'));
+    
+
+    setFormData({ ...formData, initialState: "" });
+
+  };
+
+  const hasSpace =
+        hasWhiteSpace(formData?.password) ||
+        hasWhiteSpace(formData?.confirmPassword);
+      // setHasSpace(whiteSpace);
+
+  function hasWhiteSpace(s) {
+    return s.indexOf(" ") >= 0;
+  }
+
+  const passError = formData.password.length < 6 && !!formData.password.length
+
+  const doesMatch =
+  formData?.password !== formData?.confirmPassword &&
+  formData.confirmPassword;
+const disableBtn =
+!formData?.email?.length > 0 ||
+!formData?.email?.trim() ||
+ 
+  !formData?.password?.length > 0 ||
+  !formData?.password?.trim() ||
+( !user && ( !formData?.level ||
+  !formData?.name?.length > 0  || !formData?.confirmPassword)) ||
+  hasSpace || doesMatch
+
   return (
     <div className={styles.auth}>
       <div className={styles.form__container}>
-        <h2>{!user ? "Sign up" : "Sign in"}</h2>
+        {!userMe?.result?._id && <h2>{!user ? "Sign up" : "Sign in"}</h2>}
+        {userMe?.result?._id && <h2>Edit your profile</h2>}
         <form className={styles.form}>
+
           <Box
             id={styles.auth_inputBox}
             sx={{ display: "flex", alignItems: "flex-end" }}
@@ -109,9 +172,11 @@ const Auth = () => {
               label="Email"
               name="email"
               variant="standard"
+              value={formData.email}
               className={styles.auth_input}
             />
           </Box>
+         
           {!user && (
             <>
               <Box
@@ -121,12 +186,14 @@ const Auth = () => {
                 <Person sx={{ color: "action.active", mr: 1, my: 0.5 }} />
                 <TextField
                   onChange={handleChange}
-                  id={styles.auth_input}
+                  // id={styles.auth_input}
+                  id="demo-name"
                   required
                   label="Full name"
                   variant="standard"
                   className={styles.auth_input}
                   name="name"
+                  value={formData.name}
                 />
               </Box>
               <Box
@@ -142,6 +209,7 @@ const Auth = () => {
                   variant="standard"
                   className={styles.auth_input}
                   name="program"
+                  value={formData.program}
                 />
               </Box>
               <Box
@@ -162,6 +230,7 @@ const Auth = () => {
                       onOpen={handleOpen}
                       name="level"
                       label="Level"
+                      value={formData.level}
                       onChange={handleChange}
                     >
                       <MenuItem value={100}>100</MenuItem>
@@ -171,12 +240,24 @@ const Auth = () => {
                     </Select>
                   </FormControl>
                 </div>
+                <IconButton  onClick={selectImg} style={{marginLeft: '30px',}}>
+                <ImageFill />
+          
+              </IconButton>
+              Choose your image
               </Box>
+              <input
+          multiple
+          onChange={handleImage}
+          ref={(input) => (inputFileRef = input)}
+          style={{ display: "none" }}
+          type="file"
+        />
             </>
           )}
           <Box
             id={styles.auth_inputBox}
-            sx={{ display: "flex", alignItems: "flex-end" }}
+            sx={{ display: "flex", alignItems: "flex-end", position: "relative" }}
           >
             <Lock sx={{ color: "action.active", mr: 1, my: 0.5 }} />
             <TextField
@@ -188,9 +269,12 @@ const Auth = () => {
               type={showPassword ? "text" : "password"}
               variant="standard"
               name="password"
+              error={passError}
+              value={formData.password}
+                helperText={ passError ? "Password must be at least 6 characters long" : null}
             />
             <IconButton
-              className={styles.showPassword}
+              className={`${styles.showPassword} ${passError && styles.errEye}`}
               onClick={toggleShowPassword}
             >
               {!showPassword ? (
@@ -215,42 +299,49 @@ const Auth = () => {
                 label="Confirm password"
                 name="confirmPassword"
                 variant="standard"
+                value={formData.confirmPassword}
+                error={!!doesMatch }
+                helperText={doesMatch ? "Password does not match." : null}
               />
             </Box>
           )}
         </form>
-        {!user && (
+        {(!user && !userMe?.result?._id) && (
           <p className={styles.terms}>
             By signing up your`re agree to our <span>Terms & Conditions</span>{" "}
             and <span>Privacy Policy</span>
           </p>
         )}
-        <Button
-          className={styles.signIn__button}
+      {!userMe?.result?._id &&
+          <Button
+          className={`${styles.signIn__button} ${disableBtn && styles.signIn__buttonDisable}`}
           onClick={handleSubmit}
-          // onClick={signInWithEmailAndPassword}
+          disabled={disableBtn}
         >
           {user ? "Sign In" : "Sign Up"}
         </Button>
-        <div className={styles.divider}>
-          <hr />
-          <p>or</p>
-          <hr />
-        </div>
-        <Button
-          className={styles.signInWithGoogle__button}
-          onClick={signInWithGoogle}
-        >
-          <img className={styles.googleLogo} src={Go} alt="" />
-          Continue with Google
-        </Button>
+      }
 
-        <p className={styles.login__newUser}>
-          {!user ? "Joined us before?" : "New to Upay?"}
+{userMe?.result?._id &&
+          <Button
+          className={`${styles.signIn__button} ${disableBtn && styles.signIn__buttonDisable}`}
+          onClick={handleUpdate}
+          disabled={disableBtn}
+        >
+          Save Changes
+        </Button>
+      }
+      
+      {   !userMe?.result?._id &&
+        (
+          <p className={styles.login__newUser}>
+          {!user  ? "Joined us before?" : "New to Upay?"}
           <span onClick={() => setUser((prevState) => !prevState)}>
             {!user ? "Sign In" : "Sign Up"}
           </span>
         </p>
+        )
+      }
       </div>
     </div>
   );

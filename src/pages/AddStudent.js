@@ -23,12 +23,15 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { signup, updateUser } from "../actions/auth";
 import { useStateContex } from "../store/StateProvider";
+import Navbar from "../components/Navbar";
 
 const initialState = {
   name: "",
   email: "",
   program: "",
   level: "",
+  image:"",
+  goId: "",
   password: "",
   confirmPassword: "",
 };
@@ -39,6 +42,7 @@ const AddStudent = () => {
   console.log(formData);
 
   const { currentId, isAdmin } = useStateContex();
+  console.log(currentId)
   const user = useSelector((state) =>
     currentId ? state.auth.users.find((user) => user._id === currentId) : null
   );
@@ -46,7 +50,7 @@ const AddStudent = () => {
   const id = user?.result?._id;
 
   useEffect(() => {
-    if (user) setFormData(user);
+    if (user) setFormData({ ...user, confirmPassword: user.password });
   }, [user]);
 
   const navigate = useNavigate();
@@ -73,8 +77,8 @@ const AddStudent = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (currentId ) {
-      dispatch(updateUser(id, formData, navigate));
+    if (currentId) {
+      dispatch(updateUser(currentId, formData, navigate));
     } else {
       dispatch(signup(formData, navigate));
     }
@@ -83,8 +87,41 @@ const AddStudent = () => {
     console.log(formData);
   };
 
+  const [hasSpace, setHasSpace] = useState(true);
+
+  useEffect(() => {
+    if (!user) navigate("/auth")
+  }, [user])
+
+  useEffect(() => {
+    if (isAdmin && currentId) {
+      setHasSpace(false);
+    } else {
+      const whiteSpace =
+        hasWhiteSpace(formData?.password) ||
+        hasWhiteSpace(formData?.confirmPassword);
+      setHasSpace(whiteSpace);
+    }
+  }, [currentId && isAdmin]);
+
+  function hasWhiteSpace(s) {
+    return s.indexOf(" ") >= 0;
+  }
+  const doesMatch =
+    formData?.password !== formData?.confirmPassword &&
+    formData.confirmPassword;
+  const disableBtn =
+    !formData?.name?.length > 0 ||
+    !formData?.email?.length > 0 ||
+    !formData?.email?.trim() ||
+    !formData?.password?.length > 0 ||
+    !formData?.password?.trim() ||
+    !formData?.level ||
+    hasSpace;
+
   return (
     <div className={styles.addStudent}>
+      <Navbar />
       <div className={styles.addStudent__header}>
         {" "}
         <h3>{currentId ? "Edit Student" : "Add a Student"}</h3>
@@ -186,6 +223,8 @@ const AddStudent = () => {
                 variant="standard"
                 value={formData.password}
                 name="password"
+                error={doesMatch}
+                helperText={doesMatch ? "Password does not match." : null}
               />
               <IconButton
                 className={styles.showPassword}
@@ -219,7 +258,14 @@ const AddStudent = () => {
           </>
         )}
       </form>
-      <Button className={styles.signIn__button} onClick={handleSubmit}>
+      <Button
+        disabled={disableBtn || formData.confirmPassword !== formData.password}
+        className={`${styles.signIn__button} ${
+          (disableBtn || formData.confirmPassword !== formData.password) &&
+          styles.disableBtn
+        }`}
+        onClick={handleSubmit}
+      >
         {currentId ? "Save Changes" : "Add Student"}
       </Button>
     </div>

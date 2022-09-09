@@ -1,9 +1,7 @@
 .pay {
     display: flex;
     flex-direction: column;
-    margin-top: 50px;
     align-items: center;
-    justify-content: center;
     height: 100%;
 }
 
@@ -17,6 +15,7 @@
     min-width: 100px;
     box-shadow: 0 3px 1px 10px #9c94be4b;
     border-radius: 10px;
+    margin-top: 80px;
     padding: 20px 5px;
 }
 
@@ -91,6 +90,11 @@
     background-color: rgb(24, 98, 236) !important;
     color: #fff !important;
     margin: 30px 0px 10px 0 !important;
+    text-decoration: none !important;
+}
+
+a{
+    text-decoration: none !important;
 }
 
 .disable__btn {

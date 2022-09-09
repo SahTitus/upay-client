@@ -2,7 +2,7 @@
 // import { faShare } from "@fortawesome/free-solid-svg-icons";
 // import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Add, ArrowBack, Edit, Logout } from "@mui/icons-material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "../styles/Profile.module.css";
 // import { Tab, Tabs, Avatar } from "@mui/material";
 // import SwipeableViews from "react-swipeable-views";
@@ -34,7 +34,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const Profile = () => {
-  const [user, setUser] = useState(false);
+  const user = JSON.parse(localStorage.getItem("profile"));
   const dispatch = useDispatch();
 
 
@@ -48,36 +48,37 @@ const Profile = () => {
     // closeDrawer()
   };
 
+  useEffect(() => {
+    if (!user) navigate("/auth")
+  }, [])
+
   return (
     <div className={styles.profile}>
       <div className={styles.profile__header}>
         <ArrowBack onClick={() => navigate(-1)} />
       </div>
       <div className={styles.profile__card}>
-        <Avatar className={styles.profile__avatar} />
+
+        <Avatar
+         className={styles.profile__avatar}
+              src={user?.result?.image}
+              alt={user?.result?.name}
+            >
+              {
+                user?.result?.name.charAt(0)}{" "}
+            </Avatar>
 
         <div className={styles.profile__cardInfo}>
-          <h4>Champion Bon</h4>
+          <h4>{user?.result?.name} </h4>
           <p className={styles.profile__cardInfoFollow}>
-            <span className={styles.followers}>sah@gmail.com</span>
+            <span className={styles.followers}>{user?.result?.email}</span>
             <Circle className={styles.bullet} />
-            <span className={styles.following}>Electrical Enginnering</span>
+            <span className={styles.following}>{user?.result?.program}</span>
           </p>
         </div>
-        {user ? (
-          <div user className={styles.profile__cardButtons}>
-            <button>
-              <Edit className={styles.profile__cardButton} />
-              Edit Profile
-            </button>
-            <button>
-              {/* <FontAwesomeIcon className="profile__cardButton" icon={faShare} /> */}
-              Share
-            </button>
-          </div>
-        ) : (
+   
           <div className={styles.profile__cardButtons}>
-            <Button className={styles.profile__cardButton}>
+            <Button onClick={() =>navigate('/auth')} className={styles.profile__cardButton}>
               <Edit className={styles.editIcon} />
               Edit
             </Button>
@@ -86,7 +87,7 @@ const Profile = () => {
               Log out
             </Button>
           </div>
-        )}
+
       </div>
 
       <div className="profile__tabs">{/* </SwipeableViews> */}</div>

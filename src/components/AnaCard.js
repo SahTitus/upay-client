@@ -1,8 +1,9 @@
-import { Check, Paid } from "@mui/icons-material";
+import { Paid } from "@mui/icons-material";
 import { IconButton } from "@mui/material";
 import React from "react";
 import { PeopleFill, EyeFill } from "react-bootstrap-icons";
 import { Link } from "react-router-dom";
+import { useStateContex } from "../store/StateProvider";
 import styles from "../styles/Admin.module.css";
 
 const AnaCard = ({
@@ -17,7 +18,9 @@ const AnaCard = ({
   debt,
   totStud,
   amPaid,
+  type
 }) => {
+  const { setType } = useStateContex();
   return (
     <div className={styles.analCard}>
       <div className={styles.info}>
@@ -33,7 +36,7 @@ const AnaCard = ({
         {!cash && <PeopleFill className={styles.icon} />}
         {cash && <Paid className={styles.icon} />}
         {link ? (
-          <Link to={link}>
+          <Link  onClick={() => setType(type)} to={link}>
             <IconButton className={styles.iconEye__wrapper}>
               <EyeFill className={styles.iconEye} />
             </IconButton>

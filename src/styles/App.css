@@ -24,3 +24,52 @@
 .app__body::-webkit-scrollbar{
 	display: none !important;
 }
+
+.arrowBack__navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+    background-color: #fff;
+
+    color: rgb(24, 23, 23);
+    padding: 6px 10px;	
+}
+
+.error__align {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.error-wrapper {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin-top: 10px;
+	background-color: #fff;
+	box-shadow: 0 0 2px gray;
+	border-radius: 5px;
+	width: 250px;
+	padding: 10px;
+	position: fixed;
+top: 55px;
+z-index: 10000000;
+  }
+  
+  .error-container {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	color: rgb(231, 67, 67);
+	border-radius: 10px;
+	font-size: large;
+	padding: 5px 0;
+  }
+
+.error-container p {
+	text-align: center;
+}

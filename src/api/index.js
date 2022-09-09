@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({ baseURL: "https://upay-engine.vercel.app" });
-
+// https://upay-engine.vercel.app
 
 API.interceptors.request.use((req) => {
   if (localStorage.getItem("profile")) {
@@ -20,6 +20,9 @@ export const pushReply = (id, reply) => API.patch(`/comments/${id}/reply`, reply
 export const likePost = (id) => API.patch(`/posts/${id}/likePost`);
 
 export const fetchUsers = () => API.get(`/user/users`);
+export const fetchPost = (id) => API.get(`/posts/${id}`);
+export const fetchUser = (id) => API.get(`/user/users/${id}`, {goId:id} );
+export const fetchGUser = (id) => API.get(`/user/users/${id}` );
 export const updateUser = (id, updatedUser) => API.patch(`/user/${id}`, updatedUser);
 export const makePayment = (id, paymentData) => API.patch(`/user/${id}/pay`, paymentData);
 

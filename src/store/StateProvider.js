@@ -1,4 +1,7 @@
+import { Zoom } from "@mui/material";
+import styles from "../styles/Dashboard.module.css";
 import React, { createContext, useContext, useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 // Prepares the data layer
 export const StateContext = createContext();
 
@@ -7,12 +10,37 @@ export const StateProvider = ({ children }) => {
   const [darkMode, setDarkMode] = useState(
     localStorage.getItem("theme") === "dark"
   );
- 
-  const [ replyingTo, setReplyingTo] = useState(false);
-  const [ focus, setFocus] = useState(false);
-  const [ currentId, setCurrentId ] = useState(null);
-  const [ isAdmin, setIsAdmin ] = useState(false);
-  const [ amountToPay, setAmountToPay ] = useState(0);
+
+  const [replyingTo, setReplyingTo] = useState(false);
+  const [focus, setFocus] = useState(false);
+  const [currentId, setCurrentId] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [amountToPay, setAmountToPay] = useState(0);
+  const [type, setType] = useState("");
+  const [payData, setPayData] = useState({});
+  const [throwError, setThrowError] = useState(false);
+
+  const { isError } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    if (isError?.message) setThrowError(true);
+  }, [isError]);
+
+  setTimeout(() => {
+    setThrowError(false);
+  }, 5000);
+
+  const ErrorMessage = () => {
+    return throwError ? (
+      <Zoom in="throwError" style={{ transitionDelay: "0ms" }}>
+        <div className="error-wrapper">
+          <div className="error-container">
+            <p>{isError?.message || "Somthing went wrong"}</p>
+          </div>
+        </div>
+      </Zoom>
+    ) : null;
+  };
 
   const currentTheme = localStorage.getItem("currentTheme");
 
@@ -26,7 +54,6 @@ export const StateProvider = ({ children }) => {
 
   const setMode = (e) => {
     setDarkMode(e.target.checked);
-  
   };
 
   return (
@@ -38,6 +65,11 @@ export const StateProvider = ({ children }) => {
         currentId,
         isAdmin,
         amountToPay,
+        type,
+        payData,
+        ErrorMessage,
+        setPayData,
+        setType,
         setReplyingTo,
         setMode,
         setFocus,

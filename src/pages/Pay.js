@@ -1,7 +1,9 @@
+import { ArrowBack } from "@mui/icons-material";
 import {
   Box,
   Button,
   FormControl,
+  IconButton,
   InputLabel,
   MenuItem,
   Select,
@@ -31,17 +33,17 @@ const Pay = () => {
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { setAmountToPay } = useStateContex();
+  const { setAmountToPay, setPayData } = useStateContex();
   const { payConfig } = usePaystack();
   const initPayment = usePaystackPayment(payConfig);
   const user = JSON.parse(localStorage.getItem("profile"));
 
   const id = user?.result?._id;
-  console.log(id);
+
 
   const onSuccess = (reference) => {
     // Implementation for whatever you want to do with response and after success call.
-    console.log(reference);
+
 
     const transData = {
       amount: formData.amount,
@@ -50,6 +52,7 @@ const Pay = () => {
       status: reference.status,
     };
 
+    setPayData(transData)
     dispatch(makePayment(id, transData, navigate));
   };
 
@@ -86,7 +89,6 @@ const Pay = () => {
     e.preventDefault();
     initPayment(onSuccess, onClose);
     setFormData({ ...formData, initialState: "" });
-    console.log(formData);
   };
   const isNumber = isNaN(+formData.amount) || hasWhiteSpace(formData.amount);
   const disable =
@@ -98,8 +100,19 @@ const Pay = () => {
   function hasWhiteSpace(s) {
     return s.indexOf(" ") >= 0;
   }
+
+  useEffect(() => {
+    if (!user) navigate("/auth")
+  }, [user])
+  
   return (
     <div className={styles.pay}>
+            <div className="arrowBack__navbar">
+        {/* <Sidebar toggleSlider={toggleSlider} open={open} setOpen={setOpen} /> */}
+        <IconButton onClick={() => navigate(-1)} className={styles.menu}>
+          <ArrowBack />
+        </IconButton>
+      </div>
       <div className={styles.form__container}>
         <div className={styles.pay__top}>
           <h3>Payment</h3>

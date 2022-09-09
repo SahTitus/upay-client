@@ -31,7 +31,11 @@
 
 .showPassword {
     position: absolute !important;
-    right: 30px;
+    right: 0px;
+}
+
+.errEye {
+	top: 10px;
 }
 
 .terms span {
@@ -102,4 +106,12 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
+}
+
+.disableBtn{
+	background-color: #8996aa !important;
+}
+
+.signIn__buttonDisable {
+	background-color: #788dac !important;
 }
