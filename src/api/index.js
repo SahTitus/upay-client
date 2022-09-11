@@ -1,7 +1,7 @@
 import axios from "axios";
 
-const API = axios.create({ baseURL: "https://upay-engine.vercel.app" });
-// https://upay-engine.vercel.app
+const API = axios.create({ baseURL: "https://upay-back.vercel.app/ });
+// https://upay-back.vercel.app
 
 API.interceptors.request.use((req) => {
   if (localStorage.getItem("profile")) {
