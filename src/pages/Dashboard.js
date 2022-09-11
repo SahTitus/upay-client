@@ -4,26 +4,34 @@ import av from "../images/av.svg";
 import { Box, Button, CircularProgress } from "@mui/material";
 import PaidChart from "../components/PaidChart";
 import Histories from "../components/Histories";
-import { getUser } from "../actions/auth";
+import { getUser, getUsers } from "../actions/auth";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 const Dashboard = () => {
   const userLocal = JSON.parse(localStorage.getItem("profile"));
-  const { user, users, isLoading } = useSelector((state) => state.auth);
+  const { user, users, isLoading } = useSelector(
+    (state) => state.auth
+  );
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const id = userLocal?.result?._id;
 
   useEffect(() => {
-    if (!id) navigate("/auth");
-    dispatch(getUser(id));
+    if (!id) {
+      navigate("/auth");
+    } else {
+      dispatch(getUser(id));
+    }
   }, []);
+
+  useEffect(() => {
+    dispatch(getUsers());
+  }, [dispatch]);
 
   const level100Fees = user?.transData?.map((data) =>
     data.level === 100 ? data.amount : null
   );
-  console.log(user);
   const level200Fees = user?.transData?.map((data) =>
     data.level === 200 ? data.amount : null
   );
@@ -38,8 +46,6 @@ const Dashboard = () => {
     ?.slice()
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 
-  //  const paidValues = user?.transData?.map((data) => data.amount)
-
   const sumEarnings = (arr = []) => {
     let sum = 0;
     for (let i = 0; i < arr.length; i++) {
@@ -48,6 +54,32 @@ const Dashboard = () => {
     }
     return sum;
   };
+
+  const allFees = users?.find((user) => user?.admin === true);
+
+  const myFees = allFees?.fees?.map((fee) =>
+    fee?.level === parseInt(user?.level) && fee?.program === user?.program
+      ? fee.amount
+      : null
+  );
+
+  const payableFees = () => {
+    if (parseInt(user?.level) === 100) {
+ 
+      return sumEarnings(myFees?.flat()).toFixed(2) - sumEarnings(level100Fees?.flat()).toFixed(2);
+    } else if (parseInt(user?.level) === 200) {
+      return sumEarnings(myFees?.flat()).toFixed(2) - sumEarnings(level200Fees?.flat()).toFixed(2);
+    } else if (parseInt(user?.level) === 300) {
+      return sumEarnings(myFees?.flat()).toFixed(2) - sumEarnings(level300Fees?.flat()).toFixed(2);
+    } else {
+      return sumEarnings(myFees?.flat()).toFixed(2) - sumEarnings(level400Fees?.flat()).toFixed(2);
+      
+    }
+
+  };
+
+
+    // const payableFees = ;
 
   return (
     <div className={styles.dashboard}>
@@ -58,7 +90,7 @@ const Dashboard = () => {
           <div className={styles.toPay}>
             <p>Hi {userLocal?.result?.name?.split(" ")[0]},</p>
             <h4>Payable Fee</h4>
-            <strong>GHS 1700</strong>
+            <strong>GHS {payableFees()}</strong>
             <Link className={styles.paynowLink} to="/pay">
               <Button className={styles.paynow}> Pay Now</Button>
             </Link>

@@ -18,8 +18,6 @@ const RecList = () => {
     .slice()
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 
-  console.log(type);
-
   users.map((user) =>
     user.transData.filter((data) => {
       if (data.paymentType === "School Fees" && type === "schFees") {
@@ -35,9 +33,6 @@ const RecList = () => {
       return null;
     })
   );
-
-  // console.log(users)
-  console.log(feesData);
 
   useEffect(() => {
     dispatch(getUsers());

@@ -6,6 +6,7 @@ import {
   removeUser,
   editUser,
   fetchUser,
+  adminData,
 } from "../redux/auth";
 import * as api from "../api/index.js";
 
@@ -30,6 +31,17 @@ export const getUser = (id) => async (dispatch) => {
     dispatch(isError(error?.response?.data));
   }
 };
+export const getAdmin = (id, navigate) => async (dispatch) => {
+  dispatch(isLoading());
+  try {
+    const { data } = await api.fetchAdmin(id);
+
+    navigate("/admin")
+    dispatch(adminData(data));
+  } catch (error) {
+    dispatch(isError(error?.response?.data));
+  }
+};
 
 export const updateUser =
   (id, userData, navigate, goToDashboard) => async (dispatch) => {
@@ -47,6 +59,18 @@ export const updateUser =
       dispatch(isError(error?.response?.data));
     }
   };
+
+export const addFees = (id, userData, navigate) => async (dispatch) => {
+  dispatch(isLoading());
+  try {
+    const {data} = await api.addFees(id, userData);
+
+    dispatch(adminData(data));
+    navigate("/admin");
+  } catch (error) {
+    dispatch(isError(error?.response?.data));
+  }
+};
 
 export const makePayment = (id, userData, navigate) => async (dispatch) => {
   dispatch(isLoading());

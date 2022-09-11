@@ -1,5 +1,3 @@
-import React from 'react';
-import { usePaystackPayment } from 'react-paystack';
 import { useStateContex } from '../store/StateProvider';
 
 const  usePaystack = () => {

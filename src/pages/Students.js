@@ -11,7 +11,7 @@ const Students = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { user, users, isLoading } = useSelector((state) => state.auth);
+  const { users, isLoading } = useSelector((state) => state.auth);
   const sortUsers = users
     .slice()
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
@@ -23,7 +23,7 @@ const Students = () => {
   return (
     <div className={styles.students}>
       <div className="arrowBack__navbar">
-        {/* <Sidebar toggleSlider={toggleSlider} open={open} setOpen={setOpen} /> */}
+       
         <IconButton onClick={() => navigate(-1)} className={styles.menu}>
           <ArrowBack />
         </IconButton>

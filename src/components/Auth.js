@@ -24,8 +24,6 @@ import { useNavigate } from "react-router-dom";
 import { signin, signup, updateUser } from "../actions/auth";
 import { ImageFill } from "react-bootstrap-icons";
 import Resizer from "react-image-file-resizer";
-import { useStateContex } from "../store/StateProvider";
-import { isError } from "../redux/auth";
 
 const initialState = {
   name: "",
@@ -41,9 +39,8 @@ const Auth = () => {
   const [user, setUser] = useState(true);
   const [image, setImage] = useState(null);
   const [formData, setFormData] = useState(initialState);
+  const [hasSpace, setHasSpace] = useState(false);
   const userMe = JSON.parse(localStorage.getItem("profile"));
-  console.log(userMe);
-
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -59,13 +56,14 @@ const Auth = () => {
   };
 
   useEffect(() => {
-    if (userMe) setFormData({ ...userMe?.result, confirmPassword: userMe?.result?.password });
- setImage(userMe?.result?.image);
- if (userMe?.result?._id) setUser(false);
+    if (userMe)
+      setFormData({
+        ...userMe?.result,
+        confirmPassword: userMe?.result?.password,
+      });
+    setImage(userMe?.result?.image);
+    if (userMe?.result?._id) setUser(false);
   }, []);
-
-  console.log(userMe);
-
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -83,7 +81,6 @@ const Auth = () => {
 
   const handleImage = (e) => {
     const file = e.target.files[0];
-    console.log("ss");
     Resizer.imageFileResizer(
       file,
       700,
@@ -98,60 +95,69 @@ const Auth = () => {
     );
 
     if (file["type"].split("/")[0] !== "image") {
-      alert("Hehehe 😆 file is not an image");
+      alert("This file is not an image");
     }
-    // setFileToBase(file);
   };
-
-  console.log(image)
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
     if (!user) {
-      dispatch(signup({...formData, image}, navigate));
+      dispatch(signup({ ...formData, image }, navigate));
     } else {
       dispatch(signin(formData, navigate));
     }
 
     setFormData({ ...formData, initialState: "" });
-    console.log(formData);
   };
 
-  
   const handleUpdate = (e) => {
     e.preventDefault();
 
-      dispatch(updateUser(userMe?.result?._id,{...formData, image: image}, navigate, 'goToDashboard'));
-    
+    dispatch(
+      updateUser(
+        userMe?.result?._id,
+        { ...formData, image: image },
+        navigate,
+        "goToDashboard"
+      )
+    );
 
     setFormData({ ...formData, initialState: "" });
-
   };
 
-  const hasSpace =
+  useEffect(() => {
+    if (formData.password || formData.confirmPassword) {
+      if (
         hasWhiteSpace(formData?.password) ||
-        hasWhiteSpace(formData?.confirmPassword);
-      // setHasSpace(whiteSpace);
+        hasWhiteSpace(formData?.confirmPassword)
+      ) {
+        setHasSpace(true);
+      }
+    }
+  }, []);
 
   function hasWhiteSpace(s) {
     return s.indexOf(" ") >= 0;
   }
 
-  const passError = formData.password.length < 6 && !!formData.password.length
+  const passError =
+    formData?.password?.length < 6 && !!formData?.password?.length;
 
   const doesMatch =
-  formData?.password !== formData?.confirmPassword &&
-  formData.confirmPassword;
-const disableBtn =
-!formData?.email?.length > 0 ||
-!formData?.email?.trim() ||
- 
-  !formData?.password?.length > 0 ||
-  !formData?.password?.trim() ||
-( !user && ( !formData?.level ||
-  !formData?.name?.length > 0  || !formData?.confirmPassword)) ||
-  hasSpace || doesMatch
+    formData?.password !== formData?.confirmPassword &&
+    formData?.confirmPassword;
+  const disableBtn =
+    !formData?.email?.length > 0 ||
+    !formData?.email?.trim() ||
+    !formData?.password?.length > 0 ||
+    !formData?.password?.trim() ||
+    (!user &&
+      (!formData?.level ||
+        !formData?.name?.length > 0 ||
+        !formData?.confirmPassword)) ||
+    hasSpace ||
+    doesMatch;
 
   return (
     <div className={styles.auth}>
@@ -159,7 +165,6 @@ const disableBtn =
         {!userMe?.result?._id && <h2>{!user ? "Sign up" : "Sign in"}</h2>}
         {userMe?.result?._id && <h2>Edit your profile</h2>}
         <form className={styles.form}>
-
           <Box
             id={styles.auth_inputBox}
             sx={{ display: "flex", alignItems: "flex-end" }}
@@ -176,7 +181,7 @@ const disableBtn =
               className={styles.auth_input}
             />
           </Box>
-         
+
           {!user && (
             <>
               <Box
@@ -240,24 +245,26 @@ const disableBtn =
                     </Select>
                   </FormControl>
                 </div>
-                <IconButton  onClick={selectImg} style={{marginLeft: '30px',}}>
-                <ImageFill />
-          
-              </IconButton>
-              Choose your image
+                <IconButton onClick={selectImg} style={{ marginLeft: "30px" }}>
+                  <ImageFill />
+                </IconButton>
               </Box>
               <input
-          multiple
-          onChange={handleImage}
-          ref={(input) => (inputFileRef = input)}
-          style={{ display: "none" }}
-          type="file"
-        />
+                multiple
+                onChange={handleImage}
+                ref={(input) => (inputFileRef = input)}
+                style={{ display: "none" }}
+                type="file"
+              />
             </>
           )}
           <Box
             id={styles.auth_inputBox}
-            sx={{ display: "flex", alignItems: "flex-end", position: "relative" }}
+            sx={{
+              display: "flex",
+              alignItems: "flex-end",
+              position: "relative",
+            }}
           >
             <Lock sx={{ color: "action.active", mr: 1, my: 0.5 }} />
             <TextField
@@ -271,7 +278,9 @@ const disableBtn =
               name="password"
               error={passError}
               value={formData.password}
-                helperText={ passError ? "Password must be at least 6 characters long" : null}
+              helperText={
+                passError ? "Password must be at least 6 characters long" : null
+              }
             />
             <IconButton
               className={`${styles.showPassword} ${passError && styles.errEye}`}
@@ -300,48 +309,50 @@ const disableBtn =
                 name="confirmPassword"
                 variant="standard"
                 value={formData.confirmPassword}
-                error={!!doesMatch }
+                error={!!doesMatch}
                 helperText={doesMatch ? "Password does not match." : null}
               />
             </Box>
           )}
         </form>
-        {(!user && !userMe?.result?._id) && (
+        {!user && !userMe?.result?._id && (
           <p className={styles.terms}>
             By signing up your`re agree to our <span>Terms & Conditions</span>{" "}
             and <span>Privacy Policy</span>
           </p>
         )}
-      {!userMe?.result?._id &&
+        {!userMe?.result?._id && (
           <Button
-          className={`${styles.signIn__button} ${disableBtn && styles.signIn__buttonDisable}`}
-          onClick={handleSubmit}
-          disabled={disableBtn}
-        >
-          {user ? "Sign In" : "Sign Up"}
-        </Button>
-      }
+            className={`${styles.signIn__button} ${
+              disableBtn && styles.signIn__buttonDisable
+            }`}
+            onClick={handleSubmit}
+            disabled={disableBtn}
+          >
+            {user ? "Sign In" : "Sign Up"}
+          </Button>
+        )}
 
-{userMe?.result?._id &&
+        {userMe?.result?._id && (
           <Button
-          className={`${styles.signIn__button} ${disableBtn && styles.signIn__buttonDisable}`}
-          onClick={handleUpdate}
-          disabled={disableBtn}
-        >
-          Save Changes
-        </Button>
-      }
-      
-      {   !userMe?.result?._id &&
-        (
+            className={`${styles.signIn__button} ${
+              disableBtn && styles.signIn__buttonDisable
+            }`}
+            onClick={handleUpdate}
+            disabled={disableBtn}
+          >
+            Save Changes
+          </Button>
+        )}
+
+        {!userMe?.result?._id && (
           <p className={styles.login__newUser}>
-          {!user  ? "Joined us before?" : "New to Upay?"}
-          <span onClick={() => setUser((prevState) => !prevState)}>
-            {!user ? "Sign In" : "Sign Up"}
-          </span>
-        </p>
-        )
-      }
+            {!user ? "Joined us before?" : "New to Upay?"}
+            <span onClick={() => setUser((prevState) => !prevState)}>
+              {!user ? "Sign In" : "Sign Up"}
+            </span>
+          </p>
+        )}
       </div>
     </div>
   );

@@ -2,17 +2,22 @@ import { Box, Button, CircularProgress } from "@mui/material";
 import AdmTranslist from "../components/AdmTranslist";
 import AnaCard from "../components/AnaCard";
 import styles from "../styles/Admin.module.css";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getUser, getUsers } from "../actions/auth";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
+import { useStateContex } from "../store/StateProvider";
+import { Add, Logout } from "@mui/icons-material";
+import { logoutAdmin } from "../redux/auth";
 // import Table from "../components/table/DataTable";
 
 const Admin = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const userLocal = JSON.parse(localStorage.getItem("profile"));
+  const admin = JSON.parse(localStorage.getItem("admin"));
+  const { setIsAdmin } = useStateContex();
 
   const { users, isLoading } = useSelector((state) => state.auth);
 
@@ -24,8 +29,6 @@ const Admin = () => {
   const sortTransHistory = transUsers
     .slice()
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-
-  console.log(transUsers);
 
   const schFees = users.map((user) =>
     user.transData.map((data) =>
@@ -54,13 +57,38 @@ const Admin = () => {
   const id = userLocal?.result?._id;
 
   useEffect(() => {
-    if (!id) navigate("/auth");
-    dispatch(getUser(id));
+    if (!id) {
+      navigate("/auth");
+    } else {
+      dispatch(getUser(id));
+    }
+
+    setIsAdmin(false)
+    if (!admin) navigate("/addFees");
+
   }, []);
+
+  const logOut = () => {
+    dispatch(logoutAdmin());
+    // window.location.reload(true);
+    navigate("/")
+    // closeDrawer()
+  };
 
   return (
     <div className={styles.admin}>
       <Navbar />
+      <div className={styles.topButtons}>
+        <Link onClick={()=>setIsAdmin(true)} to='/addFees'>
+        <Button className={styles.topButton}>
+          <Add className={styles.topButton__add} /> Add Fees
+        </Button>
+        </Link>
+        <Button   onClick={logOut} className={styles.topButton}>
+          {" "}
+          <Logout className={styles.topButton__log} /> Log out
+        </Button>
+      </div>
       <div className={styles.topCards}>
         <AnaCard
           link="/students"

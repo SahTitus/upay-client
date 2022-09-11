@@ -1,5 +1,6 @@
 import {
   AlternateEmail,
+  ArrowBack,
   Class,
   Lock,
   Person,
@@ -39,15 +40,11 @@ const initialState = {
 const AddStudent = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState(initialState);
-  console.log(formData);
 
-  const { currentId, isAdmin } = useStateContex();
-  console.log(currentId)
+  const { currentId, isAdmin, setCurrentId} = useStateContex();
   const user = useSelector((state) =>
     currentId ? state.auth.users.find((user) => user._id === currentId) : null
   );
-
-  const id = user?.result?._id;
 
   useEffect(() => {
     if (user) setFormData({ ...user, confirmPassword: user.password });
@@ -84,14 +81,13 @@ const AddStudent = () => {
     }
 
     setFormData({ ...formData, initialState: "" });
-    console.log(formData);
   };
 
   const [hasSpace, setHasSpace] = useState(true);
 
-  useEffect(() => {
-    if (!user) navigate("/auth")
-  }, [user])
+  // useEffect(() => {
+  //   if (!user) navigate("/pay")
+  // }, [user])
 
   useEffect(() => {
     if (isAdmin && currentId) {
@@ -119,9 +115,19 @@ const AddStudent = () => {
     !formData?.level ||
     hasSpace;
 
+   const goBack = () => {
+    setCurrentId(null)
+    navigate(isAdmin ? -1 : '/')
+   }
   return (
     <div className={styles.addStudent}>
-      <Navbar />
+         <div className="addStudent__navbar">
+        {/* <Sidebar toggleSlider={toggleSlider} open={open} setOpen={setOpen} /> */}
+        <IconButton onClick={goBack} className={styles.menu}>
+          <ArrowBack />
+        </IconButton>
+      </div>
+
       <div className={styles.addStudent__header}>
         {" "}
         <h3>{currentId ? "Edit Student" : "Add a Student"}</h3>

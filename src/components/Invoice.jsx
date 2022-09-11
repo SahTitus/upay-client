@@ -2,17 +2,13 @@ import React from "react";
 import html2pdf from "html2pdf.js";
 import styles from "../styles/Invoice.module.css";
 import { Button } from "@mui/material";
-import { useNavigate } from "react-router-dom";
 import { useStateContex } from "../store/StateProvider";
 // import { Stream } from "@mui/icons-material";
 
 const Invoice = () => {
   const user = JSON.parse(localStorage.getItem("profile"));
-  const navigate = useNavigate();
 
   const { payData } = useStateContex();
-  
-console.log(payData)
 
   const download = () => {
     const htmlFormat = document.getElementById("myInvoicePdfDownload");

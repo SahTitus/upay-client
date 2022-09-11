@@ -16,7 +16,12 @@ export const authSlice = createSlice({
       localStorage.setItem("profile", JSON.stringify({ ...action.payload }));
       state.user = action.payload;
       state.isLoading = false;
-      console.log(action.payload);
+    },
+    adminData: (state, action) => {
+      localStorage.setItem("admin", JSON.stringify({ ...action.payload }));
+      state.user = action.payload;
+      state.isLoading = false;
+
     },
     isError: (state, action) => {
       state.isLoading = false;
@@ -44,6 +49,10 @@ export const authSlice = createSlice({
       localStorage.removeItem("profile");
       state.user = null;
     },
+    logoutAdmin: (state) => {
+      localStorage.removeItem("admin");
+      state.user = null;
+    },
     removeUser: (state, action) => {
 			state.users = state.users.filter((user) => user._id !== action.payload);
       state.isLoading = false;
@@ -51,5 +60,5 @@ export const authSlice = createSlice({
   },
 });
 
-export const { authData, isError, isLoading, logout, fetchUsers, fetchUser, removeUser, editUser } = authSlice.actions;
+export const { authData, adminData, isError, isLoading, logout, logoutAdmin, fetchUsers, fetchUser, removeUser, editUser } = authSlice.actions;
 export default authSlice.reducer;

@@ -16,32 +16,22 @@ const listItems = [
     listIcon: <Home />,
     listText: "Admin",
     add: false,
-    link: "/",
+    link: "/admin",
   },
   {
     listIcon: <Apps />,
     listText: "Dashboard",
     add: false,
-    link: "/dashboard",
-  },
-  {
-    listIcon: <People />,
-    listText: "Students",
-    add: false,
-    link: "/students",
+    link: "/",
   },
 
-  {
-    listIcon: <Paid />,
-    listText: "Make payment",
-    add: false,
-    link: "/pay",
-  },
+
 ];
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
   const user = JSON.parse(localStorage.getItem("profile"));
+  const admin = JSON.parse(localStorage.getItem("admin"));
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { setIsAdmin } = useStateContex();
@@ -52,8 +42,8 @@ const Navbar = () => {
 
   const handleAddStu = () => {
     setIsAdmin(false);
-    window.location.reload(true);
-    navigate(1);
+    // window.location.reload(true);
+    navigate('/addstudent');
   };
 
   const logOut = () => {
@@ -103,6 +93,35 @@ const Navbar = () => {
           </Link>
         ))}
 
+{!admin && (
+        <Link className={styles.link} to="/pay">
+          <ListItem
+            
+            button
+            className={`${styles.drawer__listItem} `}
+          >
+            <div className={styles.drawer__listIcon}>
+            <Paid />
+            </div>
+            <div className={styles.drawer__listText}>Make payment</div>
+          </ListItem>
+          </Link>
+        )}
+
+        {admin && (
+        <Link className={styles.link} to="/students">
+          <ListItem
+            
+            button
+            className={`${styles.drawer__listItem} `}
+          >
+            <div className={styles.drawer__listIcon}>
+            <People />
+            </div>
+            <div className={styles.drawer__listText}>Students</div>
+          </ListItem>
+          </Link>
+        )}
         {!user ? (
           <Link className={styles.signIn__wrapper} to="/auth">
             <Button className={styles.signIn}>Sign In</Button>
@@ -124,7 +143,7 @@ const Navbar = () => {
           to="/addstudent"
           className={styles.navLink}
         >
-          {user?.isAdmin && user && (
+          {admin?.result?.admin && user && (
             <ListItem
               button
               className={`${styles.drawer__listItem} ${styles.add__button} `}
